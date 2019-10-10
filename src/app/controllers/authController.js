@@ -1,7 +1,6 @@
 
 require('dotenv/config');
 
-const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -10,7 +9,6 @@ const mailer = require('../../modules/mailer');
 const User = require('../model/User');
 const UserConfig = require('../model/UserConfig');
 
-const router = express.Router();
 
 function generateToken(params = {}) {
     return jwt.sign(params, process.env.AUTH, {
@@ -23,7 +21,7 @@ function validateEmailAddress(email) {
     return expression.test(String(email).toLowerCase());
 }
 
-router.get('/get_user', async (req, res) => {
+exports.getUser = async (req, res) => {
     try {
         const token = req.query.token;
 
@@ -44,9 +42,9 @@ router.get('/get_user', async (req, res) => {
     }
 
 
-});
+};
 
-router.get('/get_user_cofig', async (req, res) => {
+exports.getUserCofig = async (req, res) => {
     const token = req.query.token;
 
     const decoded = jwt.decode(token, {
@@ -56,9 +54,9 @@ router.get('/get_user_cofig', async (req, res) => {
     const config = await UserConfig.findOne(userId).sort('-createdAt');
     return res.json(config);
 
-});
+};
 
-router.post('/user_config', async (req, res) => {
+exports.userConfig = async (req, res) => {
     const {
         sidebarColor
     } = req.body;
@@ -83,9 +81,9 @@ router.post('/user_config', async (req, res) => {
             error: 'Falha ao atualizar as configurações do usuário'
         });
     }
-});
+};
 
-router.post('/register', async (req, res) => {
+exports.register = async(req, res, ) => {
     const {
         email,
         name
@@ -137,9 +135,9 @@ router.post('/register', async (req, res) => {
             error: 'Falha de registro'
         });
     }
-});
+};
 
-router.post('/authenticate', async (req, res) => {
+exports.authenticate = async (req, res) => {
     const {
         email,
         password
@@ -166,9 +164,9 @@ router.post('/authenticate', async (req, res) => {
             id: user.id,
         })));
 
-});
+};
 
-router.post('/authenticate_token', async (req, res) => {
+exports.authenticateToken = async (req, res) => {
     const {
         token
     } = req.body;
@@ -178,9 +176,9 @@ router.post('/authenticate_token', async (req, res) => {
 
         return res.status(200).send(JSON.stringify('OK'));
     });
-});
+};
 
-router.post('/forgot_password', async (req, res) => {
+exports.forgotPassword = async (req, res) => {
     const {
         email
     } = req.body
@@ -231,9 +229,9 @@ router.post('/forgot_password', async (req, res) => {
             error: err + 'Erro ao tentar recuperar password'
         });
     }
-});
+};
 
-router.post('/reset_password', async (req, res) => {
+exports.resetPassword = async (req, res) => {
     const {
         email,
         token,
@@ -274,9 +272,9 @@ router.post('/reset_password', async (req, res) => {
         })
     }
 
-})
+};
 
-router.post('/valid_token', async (req, res) => {
+exports.validToken = async (req, res) => {
     const {
         email,
         token
@@ -311,6 +309,4 @@ router.post('/valid_token', async (req, res) => {
             error: 'Erro ao resetar password'
         })
     }
-})
-
-module.exports = app => app.use('/auth', router);
+};

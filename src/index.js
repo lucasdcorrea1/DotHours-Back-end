@@ -18,10 +18,11 @@ app.use(function(req, res, next) {
 });
 app.use(cors());
 
-// app.use(require('../src/routes'));
+const holidaysRoutes = require('../src/routes/holidaysRoutes');
+const authRoutes = require('../src/routes/authRoutes');
 
-require('./app/controllers/index')(app);
-
+app.use('/holidays', holidaysRoutes);
+app.use('/auth', authRoutes);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

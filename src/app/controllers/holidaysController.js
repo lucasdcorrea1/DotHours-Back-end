@@ -1,11 +1,13 @@
-require('dotenv/config');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+
+const router = express.Router();
+
+require('dotenv/config');
 const apiCalendar = process.env.API_CALENDAR;
 
 const authMiddleware = require('../middlewares/auth');
-const router = express.Router();
 
 router.use(authMiddleware);
 
@@ -40,7 +42,7 @@ function holidaysSimple(ResponseData, month) {
     return holidays_Simple;
 };
 
-router.post('/', async (req, res) => {
+exports.holidays = async(req, res, ) => {
     try {
         const {
             year,
@@ -84,6 +86,4 @@ router.post('/', async (req, res) => {
             error: err + ''
         });
     }
-});
-
-module.exports = app => app.use('/holidays', router);
+};
