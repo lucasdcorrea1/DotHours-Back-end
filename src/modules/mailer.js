@@ -1,8 +1,10 @@
-require('dotenv/config');
+'use strict'
+
 const path = require('path');
 const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
 
+require('dotenv/config');
 const host = process.env.MAIL_HOST;
 const port = process.env.MAIL_PORT;
 const usr = process.env.MAIL_USER;

@@ -1,15 +1,50 @@
-const express = require('express');
+'use strict'
+
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
-
-const router = express.Router();
 
 require('dotenv/config');
 const apiCalendar = process.env.API_CALENDAR;
 
-const authMiddleware = require('../middlewares/auth');
 
-router.use(authMiddleware);
+exports.holidays = async(req, res) => {
+    try {
+        const {
+            year,
+            month,
+            city
+        } = req.body;
+        var yearAtual = year;
+
+        if (!city)
+            return res.status(400).send({
+                error: 'Informe o número do IBGE'
+            });
+
+        if (parseInt(month) >= 1 && parseInt(month) <= 12) {} else {
+            return res.status(400).send({
+                error: 'Mês invalido'
+            });
+        };
+
+        if (!year) {
+            yearAtual = new Date().getFullYear();
+        };
+
+        const getholidey = montaRequestGet(yearAtual, city)
+        const response = await axios.get(getholidey)
+        const holidays = holidaysSimple(response.data, month);
+
+        return res.send({
+            holidays
+        });
+
+    } catch (err) {
+        return res.status(400).send({
+            error: err + ''
+        });
+    }
+};
 
 function montaRequestGet(year, city) {
     const tokenApiCalendar = process.env.TOKEN_CALENDAR;
@@ -42,48 +77,3 @@ function holidaysSimple(ResponseData, month) {
     return holidays_Simple;
 };
 
-exports.holidays = async(req, res, ) => {
-    try {
-        const {
-            year,
-            month,
-            city
-        } = req.body;
-        const token = req.headers.authorization;
-        var yearAtual = year;
-
-        if (!city)
-            return res.status(400).send({
-                error: 'Informe o número do IBGE'
-            });
-
-        if (parseInt(month) >= 1 && parseInt(month) <= 12) {} else {
-            return res.status(400).send({
-                error: 'Mês invalido'
-            });
-        };
-
-        if (!year) {
-            yearAtual = new Date().getFullYear();
-        };
-
-        const getholidey = montaRequestGet(yearAtual, city)
-        const decoded = jwt.decode(token, {
-            complete: true
-        });
-
-        const userId = decoded.payload["id"];
-        const response = await axios.get(getholidey)
-        const holidays = holidaysSimple(response.data, month);
-
-        return res.send({
-            userId,
-            holidays
-        });
-
-    } catch (err) {
-        return res.status(400).send({
-            error: err + ''
-        });
-    }
-};
